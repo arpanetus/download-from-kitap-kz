@@ -4,7 +4,7 @@
  ## how-to-use?
   - `git clone https://github.com/arpanetus/download-from-kitap-kz`
   - `pip3 install -r reqs.txt`
-  - `python3 download_from_kitap_kz.py --filename "{the-name-under-which-you'd_like_save}" --url "{url-from-kitap-kz}"
+  - `python3 download_from_kitap_kz.py --filename "{the-name-under-which-you'd_like_save}" --url "{url-from-kitap-kz}"`
   - That's it!
 
  ## url-requirements:
