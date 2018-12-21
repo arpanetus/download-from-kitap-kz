@@ -24,12 +24,12 @@ def get_default_filename(url):
   filename_raw = re.findall("s\/.+\/r",url)[0]
   return filename_raw[2:len(filename_raw)-2]+".epub"
 
-def arguments(def_dir):
+def arguments():
   parser = argparse.ArgumentParser()
   parser.add_argument("--filename", help="the name under which you'd like to save")
   parser.add_argument("--url", help="the url of book to download")
   parser.add_argument("--link", const=1, nargs='?', type=int, help="generate link of download")
-  parser.add_argument("--dir", default=def_dir, help="directory of download")
+  parser.add_argument("--dir", default='~/Documents/books', help="directory of download (default: ~/Documents/books)")
   args = parser.parse_args()
 
   if not (args.url):
@@ -38,10 +38,11 @@ def arguments(def_dir):
   else:
     url = args.url
   filename = get_default_filename(url)
+  dir = args.dir.replace("~", str(Path.home()))
   link = args.link
   if args.filename:
     filename = args.filename + ".epub"
-  return filename, url, link, args.dir
+  return filename, url, link, dir
 
 def rename_file(downloaded_filename,filename,def_dir):
   print(" --- Starting to rename downloaded file --- ")
@@ -57,17 +58,17 @@ def rename_file(downloaded_filename,filename,def_dir):
 def downloaded(filename, def_dir):
   return os.path.isfile('{}/{}'.format(def_dir, filename))
 
+
 if __name__=="__main__":
 
-  default_dir = str(Path.home()) + '/Documents/books'
-  filename, url, getlink, def_dir = arguments(default_dir)
-  def_dir = def_dir.replace("~", str(Path.home()))
-  if not downloaded(filename, def_dir):
+  filename, url, getlink, dir = arguments()
+
+  if not downloaded(filename, dir):
     if getlink:
       print("Your download link: {}".format(get_link(url)))
     else:
       downloaded_filename = download_from_link(get_link(url))
-      rename_file(downloaded_filename, filename, def_dir)
+      rename_file(downloaded_filename, filename, dir)
       print(" --- File from: \n\t" + url + "\nhas been successfully downloaded! --- ")
       print(" --- It lies under the filename: \n\t"+filename+" --- ")
   else:
