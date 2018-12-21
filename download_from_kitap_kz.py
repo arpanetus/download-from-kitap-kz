@@ -4,9 +4,10 @@ import wget
 import argparse
 import sys
 import os
+from pathlib import Path
 
 def get_link(read_link):
-  print(" --- Starting to fetch the link --- ") 
+  print(" --- Starting to fetch the link --- ")
   r = requests.get(read_link)
   link = re.findall("data\-book\=\".+\.epub\"",r.text)[0].split('=')[1]
   print(" --- Link's been fetched --- ")
@@ -27,30 +28,48 @@ def arguments():
   parser = argparse.ArgumentParser()
   parser.add_argument("--filename", help="the name under which you'd like to save")
   parser.add_argument("--url", help="the url of book to download")
+  parser.add_argument("--link", const=1, nargs='?', type=int, help="generate link of download")
+  parser.add_argument("--dir", default=DEFAULT_DIRECTORY, help="directory of download (default: {})".format(DEFAULT_DIRECTORY))
   args = parser.parse_args()
 
   if not (args.url):
-    print(" --- Please provide a link! ---") 
-    sys.exit(0) 
+    print(" --- Please provide a link! ---")
+    sys.exit(0)
   else:
     url = args.url
   filename = get_default_filename(url)
+  dir = args.dir
+  link = args.link
   if args.filename:
     filename = args.filename + ".epub"
-  return filename, url
+  return filename, url, link, dir
 
-def rename_file(downloaded_filename,filename):
+def rename_file(downloaded_filename,filename,def_dir):
   print(" --- Starting to rename downloaded file --- ")
+  try:
+      os.mkdir('{}'.format(def_dir))
+  except Exception:
+      pass
   for current_filename in os.listdir("."):
     if current_filename.startswith(downloaded_filename):
-      os.rename(current_filename, filename)
+      os.rename(current_filename, '{}/{}'.format(def_dir, filename))
   print(" --- Renaming is done --- ")
 
-if __name__=="__main__": 
-  
-  filename, url = arguments()
-  downloaded_filename = download_from_link(get_link(url))
-  rename_file(downloaded_filename, filename)
-  
-  print(" --- File from: \n\t" + url + "\nhas been successfully downloaded! --- ")
-  print(" --- It lies under the filename: \n\t"+filename+" --- ")
+def downloaded(filename, def_dir):
+  return os.path.isfile('{}/{}'.format(def_dir, filename))
+
+if __name__=="__main__":
+
+  DEFAULT_DIRECTORY = str(Path.home()) + '/Documents/books'
+  filename, url, getlink, directory = arguments()
+
+  if not downloaded(filename, directory):
+    if getlink:
+      print("Your download link: {}".format(get_link(url)))
+    else:
+      downloaded_filename = download_from_link(get_link(url))
+      rename_file(downloaded_filename, filename, directory)
+      print(" --- File from: \n\t" + url + "\nhas been successfully downloaded! --- ")
+      print(" --- It lies under the filename: \n\t"+filename+" --- ")
+  else:
+    print(" --- You have already downloaded this book --- ")
