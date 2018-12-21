@@ -29,7 +29,7 @@ def arguments():
   parser.add_argument("--filename", help="the name under which you'd like to save")
   parser.add_argument("--url", help="the url of book to download")
   parser.add_argument("--link", const=1, nargs='?', type=int, help="generate link of download")
-  parser.add_argument("--dir", default='~/Documents/books', help="directory of download (default: ~/Documents/books)")
+  parser.add_argument("--dir", default=DEFAULT_DIRECTORY, help="directory of download (default: {})".format(DEFAULT_DIRECTORY))
   args = parser.parse_args()
 
   if not (args.url):
@@ -38,7 +38,7 @@ def arguments():
   else:
     url = args.url
   filename = get_default_filename(url)
-  dir = args.dir.replace("~", str(Path.home()))
+  dir = args.dir
   link = args.link
   if args.filename:
     filename = args.filename + ".epub"
@@ -58,17 +58,17 @@ def rename_file(downloaded_filename,filename,def_dir):
 def downloaded(filename, def_dir):
   return os.path.isfile('{}/{}'.format(def_dir, filename))
 
-
 if __name__=="__main__":
 
-  filename, url, getlink, dir = arguments()
+  DEFAULT_DIRECTORY = str(Path.home()) + '/Documents/books'
+  filename, url, getlink, directory = arguments()
 
-  if not downloaded(filename, dir):
+  if not downloaded(filename, directory):
     if getlink:
       print("Your download link: {}".format(get_link(url)))
     else:
       downloaded_filename = download_from_link(get_link(url))
-      rename_file(downloaded_filename, filename, dir)
+      rename_file(downloaded_filename, filename, directory)
       print(" --- File from: \n\t" + url + "\nhas been successfully downloaded! --- ")
       print(" --- It lies under the filename: \n\t"+filename+" --- ")
   else:
