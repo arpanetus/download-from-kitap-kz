@@ -4,7 +4,7 @@
  ## How to use?
   - `git clone https://github.com/arpanetus/download-from-kitap-kz`
   - `pip3 install -r reqs.txt`
-  - `python3 download_from_kitap_kz.py --url "{url-from-kitap-kz}"
+  - `python3 download_from_kitap_kz.py --url "{url-from-kitap-kz}"`
   - That's it! Your book has been downloaded to `~/Documents/books` folder
 
  ## Save under your name
